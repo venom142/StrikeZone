@@ -1,0 +1,42 @@
+name: StrikeZone Mobile APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "strikezone/**"
+      - ".github/workflows/strikezone-android.yml"
+
+jobs:
+  android:
+    runs-on: ubuntu-22.04
+    container:
+      image: barichello/godot-ci:4.4.1
+    env:
+      GODOT_VERSION: "4.4.1"
+      PROJECT_PATH: "strikezone"
+      EXPORT_NAME: "StrikeZoneMobile"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Godot Android templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          mkdir -p ~/.config
+          if [ -d /root/.config/godot ]; then cp -r /root/.config/godot ~/.config/; fi
+          if [ -d /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ]; then
+            cp -r /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/
+          fi
+
+      - name: Export Android APK
+        run: |
+          mkdir -p build/android
+          cd "${PROJECT_PATH}"
+          godot --headless --path . --export-debug "Android" "../build/android/${EXPORT_NAME}.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: StrikeZone-Mobile-APK
+          path: build/android/StrikeZoneMobile.apk
