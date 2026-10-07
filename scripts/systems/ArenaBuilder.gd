@@ -39,7 +39,7 @@ func box(pos: Vector3, size: Vector3, color: Color, collision := true, glow := C
     return body
 
 func build() -> void:
-    var low := SettingsManager.data.graphics == "LOW"
+    var low: bool = SettingsManager.data.graphics == "LOW"
     box(Vector3(0,-0.5,0), Vector3(80,1,80), Color("#11182a"))
     for x in [-40.0,40.0]: box(Vector3(x,4,0),Vector3(1,8,80),Color("#1d2941"))
     for z in [-40.0,40.0]: box(Vector3(0,4,z),Vector3(80,8,1),Color("#1d2941"))
