@@ -34,6 +34,13 @@ jobs:
           test -d "$ANDROID_HOME/platforms/android-35"
           test -d "$ANDROID_HOME/build-tools/35.0.1"
 
+      - name: Generate Android debug keystore
+        run: |
+          set -eux
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
+          test -f "$HOME/.android/debug.keystore"
+
       - name: Download Godot 4.5.2
         run: |
           set -eux
