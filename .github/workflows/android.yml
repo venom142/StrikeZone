@@ -61,7 +61,7 @@ jobs:
         run: |
           set -eux
           mkdir -p build/android
-          ./godot_bin/Godot_v4.5.2-stable_linux.x86_64 --headless --path . --export-debug Android build/android/StrikeZoneMobile.apk
+          ./godot_bin/Godot_v4.5.2-stable_linux.x86_64 --headless --path . --verbose --export-debug Android build/android/StrikeZoneMobile.apk
 
       - name: Verify APK
         run: |
