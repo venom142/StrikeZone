@@ -10,8 +10,6 @@ on:
 jobs:
   android:
     runs-on: ubuntu-22.04
-    container:
-      image: barichello/godot-ci:4.4.1
     env:
       GODOT_VERSION: "4.4.1"
       PROJECT_PATH: "strikezone"
@@ -20,14 +18,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare Godot Android templates
+      - name: Install Godot and Android export dependencies
         run: |
-          mkdir -p ~/.local/share/godot/export_templates
-          mkdir -p ~/.config
-          if [ -d /root/.config/godot ]; then cp -r /root/.config/godot ~/.config/; fi
-          if [ -d /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ]; then
-            cp -r /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/
-          fi
+          sudo apt-get update
+          sudo apt-get install -y unzip wget
+          wget -q https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q Godot_v4.4.1-stable_linux.x86_64.zip
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          wget -q https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          unzip -q Godot_v4.4.1-stable_export_templates.tpz -d /tmp/godot_templates
+          cp -r /tmp/godot_templates/templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
+          mkdir -p ~/.config/godot
+          printf '[android]\nandroid_sdk_path = "/opt/android-sdk"\n' > ~/.config/godot/editor_settings-4.tres
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null || true
+          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Export Android APK
         run: |
