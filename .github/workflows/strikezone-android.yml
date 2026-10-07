@@ -11,14 +11,13 @@ jobs:
   android:
     runs-on: ubuntu-22.04
     env:
-      GODOT_VERSION: "4.4.1"
-      PROJECT_PATH: "strikezone"
-      EXPORT_NAME: "StrikeZoneMobile"
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Godot and Android export dependencies
+      - name: Install Godot
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip wget
@@ -30,22 +29,26 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
           unzip -q Godot_v4.4.1-stable_export_templates.tpz -d /tmp/godot_templates
           cp -r /tmp/godot_templates/templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
-          mkdir -p ~/.config/godot
-          printf '[android]\nandroid_sdk_path = "/opt/android-sdk"\n' > ~/.config/godot/editor_settings-4.tres
 
-      - name: Install Android SDK packages
+      - name: Configure Godot Android SDK
         run: |
-          yes | sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null || true
-          sudo /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          mkdir -p ~/.config/godot
+          printf '[android]\nandroid_sdk_path = "/usr/local/lib/android/sdk"\n' > ~/.config/godot/editor_settings-4.tres
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Validate project
+        run: godot --headless --path strikezone --editor --quit
 
       - name: Export Android APK
         run: |
           mkdir -p build/android
-          cd "${PROJECT_PATH}"
-          godot --headless --path . --export-debug "Android" "../build/android/${EXPORT_NAME}.apk"
+          godot --headless --path strikezone --export-debug "Android" "build/android/StrikeZoneMobile.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: StrikeZone-Mobile-APK
           path: build/android/StrikeZoneMobile.apk
+          if-no-files-found: error
