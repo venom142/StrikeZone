@@ -120,6 +120,6 @@ func _process(_delta: float) -> void:
             active_bots += 1
     var round := debug_match.round_no if debug_match else 0
     var pos := debug_player.global_position if debug_player else Vector3.ZERO
-    var physics := Engine.get_physics_frames_per_second()
+    var physics := Engine.physics_ticks_per_second
     var cpu_ms := Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
     debug_label.text = "FPS %d\nCPU %.2fms\nPhysics %d\nBots %d/%d\nRound %d/5\nPos %.1f, %.1f, %.1f" % [Engine.get_frames_per_second(), cpu_ms, physics, active_bots, bot_count, round, pos.x, pos.y, pos.z]
