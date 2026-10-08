@@ -95,7 +95,7 @@ func _look(delta: float) -> void:
     camera.rotation.x = deg_to_rad(pitch)
     touch_look = touch_look.lerp(Vector2.ZERO, minf(1.0, delta * 12.0))
 
-func set_look(delta_vec: Vector2) -> void: touch_look += delta_vec * 0.01
+func set_look(delta_vec: Vector2) -> void: touch_look += delta_vec * 0.7
 func set_move(value: Vector2) -> void: mobile_move = value
 func set_sprint(value: bool) -> void: sprinting = value
 func jump() -> void:
