@@ -83,8 +83,6 @@ func _make_button(text_value: String, pos: Vector2, button_size: Vector2) -> But
 func setup(p: Node, mm: Node) -> void:
     player = p
     match_manager = mm
-    if player:
-        player.set_process_input(false)
 
 func _on_move(value: Vector2) -> void:
     if player:
