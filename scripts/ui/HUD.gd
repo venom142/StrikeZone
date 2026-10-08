@@ -122,7 +122,7 @@ func _input(event: InputEvent) -> void:
                 player.set_sprint(true)
                 touch_finger = event.index
                 return
-            if joystick_visual.get_rect().has_point(p):
+            if Rect2(joystick_visual.position, joystick_visual.size).has_point(p):
                 joystick_finger = event.index
                 _update_joystick(p)
                 return
